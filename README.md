@@ -3,7 +3,11 @@ Pebble Hangul Watch
 
 ![First screenshot](https://raw2.github.com/andrwj/pebble-hangul-watch/master/screenshot.jpg)
 --
-* 페블용 한글시계는 [@krazyeom](http://twitter.com/krazyeom)님의 아이디어로 시작되었고, [@drunkhacker](http://twitter.com/drunkhacker)님이 구현하였으며, [@andrwj](http://twitter.com/andrwj)가 SDK2에 맞춰 변환하였고 몇가지 옵션을 제공하도록 수정/추가 하였습니다. 
+페블용 한글시계는 [@krazyeom](http://twitter.com/krazyeom)님의 아이디어로 시작되었고, [@drunkhacker](http://twitter.com/drunkhacker)님이 구현하였으며, [@andrwj](http://twitter.com/andrwj)가 SDK2에 맞춰 변환하였고 몇가지 옵션을 제공하도록 수정/추가 하였습니다. 
+
+
+v1.2.1
+
 * [내려받기 v1.2.1](https://raw2.github.com/andrwj/pebble-hangul-watch/master/pebble-hangul-watch-v1.2.1.pbw) 
 * 배경색 변경을 지원합니다.
 * 도트 생략정도를 선택할 수 있습니다.
