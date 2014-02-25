@@ -13,9 +13,10 @@ v1.2.1
 * 도트 생략정도를 선택할 수 있습니다.
 * 흔들거나 탭을 하여 배경색상및 글자색을 뒤집을 수 있습니다 (2초 이내에 `tap` 두번)
 
-![normal1](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/1.png)   ![normal2](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/2.png)   ![normal3](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/3.png)   ![normal4](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/4.png)   ![normal5](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/5.png)   ![normal6](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/6.png)   ![normal7](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/7.png)   ![reverse1](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/r1.png)   
+![normal1](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/1.png)   ![normal2](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/2.png)   ![normal3](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/3.png)   ![normal4](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/4.png)   ![normal5](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/5.png)   ![normal6](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/6.png)   ![normal7](https://raw.github.com/andrwj/pebble-hangul-watch/master/docs/7.png)   
 
-![reverse2](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/r2.png)   ![reverse3](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/r3.png)   ![reverse4](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/r4.png)   ![reverse5](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/r5.png)   ![reverse6](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/r6.png)   ![reverse7](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/r7.png)   
+   
+![reverse1](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/r1.png)   ![reverse2](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/r2.png)   ![reverse3](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/r3.png)   ![reverse4](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/r4.png)   ![reverse5](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/r5.png)   ![reverse6](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/r6.png)   ![reverse7](https://raw.github.com/andrwj/pebble-hangul-watch/master/docs/r7.png)   
 
 ![Preference Panel](https://raw.github.com/andrwj/pebble-hangul-watch/master/docs/hangul-watch-preferences.png)
 
