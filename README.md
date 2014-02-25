@@ -13,7 +13,7 @@ Pebble Hangul Watch
 
 ![reverse2](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/r2.png)   ![reverse3](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/r3.png)   ![reverse4](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/r4.png)   ![reverse5](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/r5.png)   ![reverse6](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/r6.png)   ![reverse7](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/r7.png)   
 
-![Preference Panel](https://raw2.github.com/andrwj/pebble-hangul-watch/master/docs/hangul-watch-preferences.png)   
+![Preference Panel](https://raw.github.com/andrwj/pebble-hangul-watch/master/docs/hangul-watch-preferences.png)
 
 
 ##### Converted to SDK 2.0 
