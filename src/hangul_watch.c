@@ -1,40 +1,30 @@
-#include "pebble_os.h"
-#include "pebble_app.h"
+/**
+ *  Original Source from: https://github.com/drunkhacker/pebble-hangul-watch
+ *  Original Creator: DrunkHacker, http://blog.drunkhacker.me/?p=292
+ *
+ *  Modified Date: 2014-2-23, By: A.J <andrwj@gmail.com>
+ *  Modified Repository: https://github.com/andrwj/pebble-hangul-watch
+ */
+#include <pebble.h>
+#define  LAYERS  36
 
 typedef struct CharLayer {
-  Layer layer;
-  const char *c;
-  bool bold;
+  Layer       *layer;
+  const char  *c;
+  bool        bold;
 } CharLayer;
 
-#define MY_UUID {0x71, 0x12, 0xD6, 0x24, 0x65, 0x55, 0x42, 0x79, 0x89, 0xAE, 0xC0, 0x86, 0xE9, 0x36, 0x94, 0x27}
-PBL_APP_INFO(MY_UUID,
-       "Hangul#1", "Drunkhacker.net",
-       0, 1, /* App major/minor version */
-       DEFAULT_MENU_ICON,
-       APP_INFO_WATCH_FACE);
+static CharLayer  *layers[LAYERS];
 
-Window window;
-
-ResHandle light_font;
-ResHandle bold_font;
-
-void char_layer_update_proc(CharLayer *char_layer, GContext *ctx);
-
-void char_layer_init(CharLayer *char_layer, GRect frame, bool b) {
-  layer_init(&char_layer->layer, frame);
-  char_layer->layer.update_proc = (LayerUpdateProc)char_layer_update_proc;
-  char_layer->bold = b;
-}
-
-void char_layer_set_char(CharLayer *char_layer, const char *c) {
-  char_layer->c = c;
-}
+static Window     *window;
+static ResHandle  light_font;
+static ResHandle  bold_font;
+static struct tm  prev_t;
 
 void hangul_char_split(const char *c, int *cho, int *jung, int *jong) {
   int d = ((c[0] & 0x0F) << 12) | ((c[1] & 0x3F) << 6) | (c[2] & 0x3F);
-  d -= 44032;
-  *cho = d / (21*28);
+     d -= 44032;
+  *cho  = d / (21*28);
   *jung = (d % (21*28)) / 28;
   *jong = d % 28;
 }
@@ -48,9 +38,9 @@ static int jong_bul[] = {0, 2, 0, 2, 1, 2, 1, 2, 3, 0, 2, 1, 3, 3, 1, 2, 1, 3, 3
 static int yOffset = 10;
 static int xOffset = 3;
 
-static int chomap[36][3];
-static int jungmap[36][3];
-static int jongmap[36][3];
+static int chomap[LAYERS][3];
+static int jungmap[LAYERS][3];
+static int jongmap[LAYERS][3];
 
 uint8_t cachedBitmapData[3456];
 int cachePointer;
@@ -63,18 +53,17 @@ uint8_t*getNewBitmapBuffer(int size) {
 
 void get_bitmap_cached(int map[][3], int addr, uint8_t **data, bool bold) {
   int i;
-  for (i=0;i<36;i++) {
-    if (map[i][0] == addr) { //hit
+  for (i=0;i<LAYERS;i++) {
+    if (map[i][0] == addr) {
       break;
     }
   }
-  if (i == 36) { //nohit
-    for (i=0;i<36;i++) { if (map[i][0] == 0) break; }
+  if (i == LAYERS) {
+    for (i=0;i<LAYERS;i++) { if (map[i][0] == 0) break; }
     map[i][0] = addr;
     map[i][1] = (int)getNewBitmapBuffer(32);
     map[i][2] = (int)getNewBitmapBuffer(32);
 
-    //load resource
     resource_load_byte_range(light_font, addr, (uint8_t*)map[i][1], 32);
     resource_load_byte_range(bold_font, addr, (uint8_t*)map[i][2], 32);
   }
@@ -82,79 +71,26 @@ void get_bitmap_cached(int map[][3], int addr, uint8_t **data, bool bold) {
   *data = bold ? (uint8_t*)map[i][2] : (uint8_t*)map[i][1];
 }
 
-void char_layer_update_proc(CharLayer *char_layer, GContext *ctx) {
-  graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_rect(ctx, char_layer->layer.bounds, 0, GCornerNone);
-  //parse char
-  int c, j, j_;
-  hangul_char_split(char_layer->c, &c, &j, &j_);
-
-  int cb_i = cho_bul[(j_ == 0 ? 0 : 1)*21 + j];
-  int cho_offset = (cb_i*20 + (c+1))*32;
-
-  int jb_i = jung_bul[(j_ == 0 ? 0 : 1)*19 + c];
-  int jung_offset = (160 + jb_i*22 + (j+1))*32;
-
-  int jjb_i = jong_bul[j];
-  int jong_offset = (248 + jjb_i*28 + j_)*32;
-
-  int i;
-
-  //get binary data
-  uint8_t *cho_bitmap;
-  uint8_t *jung_bitmap;
-  uint8_t *jong_bitmap;
-
-  get_bitmap_cached(chomap, cho_offset, &cho_bitmap, char_layer->bold);
-  get_bitmap_cached(jungmap, jung_offset, &jung_bitmap, char_layer->bold);
-  get_bitmap_cached(jongmap, jong_offset, &jong_bitmap, char_layer->bold);
-
-
-  //draw actual bitmap
-  int x, y;
-  GPoint p;
-  GRect f = layer_get_frame(&char_layer->layer);
-  for (y=0;y<16;y++) {
-    p.y = y + f.origin.y;
-    for (j=0;j<2;j++) {
-      uint8_t line1 = *cho_bitmap;
-      uint8_t line2 = *jung_bitmap;
-      uint8_t line3 = *jong_bitmap;
-      uint8_t line = line1 | line2 | line3;
-
-      for (x=0;x<8;x++) {
-        p.x = j*8 + x + f.origin.x;
-        graphics_context_set_stroke_color(ctx, (0x1 & (line >> (7 - x))) ? GColorWhite : GColorBlack);
-        graphics_draw_pixel(ctx, p);
-      }
-      cho_bitmap++;
-      jung_bitmap++;
-      jong_bitmap++;
-    }
-  }
-}
-
 static char *characters[] = {
-  "오", "전", "후", "열", "한", "두", 
-  "세", "일", "곱", "다", "여", "섯", 
-  "네", "여", "덟", "아", "홉", "시", 
-  "자", "이", "삼", "사", "오", "십", 
-  "정", "오", "일", "이", "삼", "사", 
+  "오", "전", "후", "열", "한", "두",
+  "세", "일", "곱", "다", "여", "섯",
+  "네", "여", "덟", "아", "홉", "시",
+  "자", "이", "삼", "사", "오", "십",
+  "정", "오", "일", "이", "삼", "사",
   "육", "칠", "팔", "구", "분", "초"};
 
-void get_char_indexes(int h, int m, int *indices) { 
+void get_char_indexes(int h, int m, int *indices) {
   int *pc = indices;
   bool pm = h >= 12;
 
   if (h == 0) {
-    if (pm) { 
+    if (pm) {
       *pc++ = 24;
       *pc++ = 25;
     } else {
       *pc++ = 18;
       *pc++ = 24;
     }
-    return;
   }
 
   if (pm) {
@@ -223,99 +159,146 @@ void get_char_indexes(int h, int m, int *indices) {
     *pc++ = 25;
   else if (m % 10 <= 4)
     *pc++ = (m % 10) + 25;
-  else 
+  else
     *pc++ = (m % 10) + 24;
 
-  if (m != 0) 
+  if (m != 0)
     *pc++ = 34;
 
   *pc = -1;
 }
 
+void char_layer_update_proc(Layer *layer, GContext *ctx) {
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_fill_rect(ctx, layer_get_bounds(layer), 0, GCornerNone);
+  CharLayer *pl = (CharLayer *)layer_get_data(layer);
 
-CharLayer layers[36];
+  int c, j, j_;
+  hangul_char_split(pl->c, &c, &j, &j_);
 
-// Called once per second
-PblTm currentTime;
-void handle_second_tick(AppContextRef ctx, PebbleTickEvent *t) {
+  int cb_i = cho_bul[(j_ == 0 ? 0 : 1)*21 + j];
+  int cho_offset = (cb_i*20 + (c+1))*32;
 
-  (void)t;
-  (void)ctx;
+  int jb_i = jung_bul[(j_ == 0 ? 0 : 1)*19 + c];
+  int jung_offset = (160 + jb_i*22 + (j+1))*32;
 
-  //get old indexes
+  int jjb_i = jong_bul[j];
+  int jong_offset = (248 + jjb_i*28 + j_)*32;
+
+  uint8_t *cho_bitmap;
+  uint8_t *jung_bitmap;
+  uint8_t *jong_bitmap;
+
+  get_bitmap_cached(chomap, cho_offset, &cho_bitmap, pl->bold);
+  get_bitmap_cached(jungmap, jung_offset, &jung_bitmap, pl->bold);
+  get_bitmap_cached(jongmap, jong_offset, &jong_bitmap, pl->bold);
+
+
+  int x, y;
+  GPoint p;
+  GRect f = layer_get_bounds(layer);
+
+  for (y=0;y<16;y++) {
+    p.y = y + f.origin.y;
+    for (j=0;j<2;j++) {
+      uint8_t line1 = *cho_bitmap;
+      uint8_t line2 = *jung_bitmap;
+      uint8_t line3 = *jong_bitmap;
+      uint8_t line = line1 | line2 | line3;
+      for (x=0;x<8;x++) {
+        if(!pl->bold && (x % 3)) continue;
+        p.x = j*8 + x + f.origin.x;
+        graphics_context_set_stroke_color(ctx, (0x1 & (line >> (7 - x))) ? GColorWhite : GColorBlack);
+        graphics_draw_pixel(ctx, p);
+      }
+      cho_bitmap++;
+      jung_bitmap++;
+      jong_bitmap++;
+    }
+  }
+}
+
+static void handle_second_tick(struct tm *t, TimeUnits units_changed) {
+
   int old_indexes[11] = {-1,};
-  get_char_indexes(currentTime.tm_hour, currentTime.tm_min, old_indexes);
-
-  get_time(&currentTime);
+  get_char_indexes(prev_t.tm_hour, prev_t.tm_min, old_indexes);
 
   int new_indexes[11] = {-1,};
-  get_char_indexes(currentTime.tm_hour, currentTime.tm_min, new_indexes);
+  get_char_indexes(t->tm_hour, t->tm_min, new_indexes);
 
   int *pc = old_indexes;
-  while(*pc >= 0) { 
-    layers[*pc].bold = false;
-    layer_mark_dirty(&layers[*pc].layer);
+  while(*pc >= 0) {
+    layers[*pc]->bold = false;
+    layer_mark_dirty(layers[*pc]->layer);
     pc++;
   }
   pc = new_indexes;
-  while(*pc >= 0) { 
-    layers[*pc].bold = true;
-    layer_mark_dirty(&layers[*pc].layer);
+  while(*pc >= 0) {
+    layers[*pc]->bold = true;
+    layer_mark_dirty(layers[*pc]->layer);
     pc++;
   }
-
+  prev_t = *t;
 }
 
-void handle_deinit(AppContextRef ctx) {
-}
-void handle_init(AppContextRef ctx) {
-  (void)ctx;
+static void window_load(Window *window) {
+  Layer *window_layer = window_get_root_layer(window);
 
-  window_init(&window, "Hangul Watch");
-  window_stack_push(&window, true /* Animated */);
-  window_set_background_color(&window, GColorBlack);
-
-  resource_init_current_app(&HANGUL_WATCH_RESOURCES);
-
-  //load resource
   light_font = resource_get_handle(RESOURCE_ID_FONT_HAN_LIGHT);
   bold_font = resource_get_handle(RESOURCE_ID_FONT_HAN_BOLD);
 
-  //cache map init
-  memset(chomap, 0, 108);
-  memset(jungmap, 0, 108);
-  memset(jongmap, 0, 108);
+  memset(chomap,  0, sizeof(chomap));
+  memset(jungmap, 0, sizeof(jungmap));
+  memset(jongmap, 0, sizeof(jongmap));
 
   cachePointer = 0;
 
-  //layer initialization (36개)
-
   int r, c;
+  Layer     *layer;
+  CharLayer *pl;
+
   for (r=0;r<6;r++) {
     for (c=0;c<6;c++) {
-      CharLayer *pLayer = &layers[r*6+c];
-      char_layer_init(pLayer, GRect(xOffset + c*24, r*24 + yOffset ,24,24), false);
-      char_layer_set_char(pLayer, characters[r*6+c]);
-      layer_add_child(&window.layer, &pLayer->layer);
+      layer           = layer_create_with_data(GRect(xOffset + c*24, r*24 + yOffset ,24,24), sizeof(CharLayer));
+      pl              = layer_get_data(layer);
+      pl->layer       = layer;
+      pl->bold        = false;
+      pl->c           = characters[r*6+c];
+      layers[r*6+c]   = pl;
+      layer_add_child(window_layer, layer);
+      layer_set_update_proc(layer, char_layer_update_proc);
     }
   }
 
-  // Ensures time is displayed immediately (will break if NULL tick event accessed).
-  // (This is why it's a good idea to have a separate routine to do the update itself.)
-  get_time(&currentTime);
-  handle_second_tick(ctx, NULL);
+  time_t now = time(0);
+  prev_t = *localtime(&now);
+  tick_timer_service_subscribe(MINUTE_UNIT, handle_second_tick);
 }
 
-void pbl_main(void *params) {
-  PebbleAppHandlers handlers = {
-    .init_handler = &handle_init,
-    .deinit_handler = &handle_deinit,
-    .tick_info = {
-      .tick_handler = &handle_second_tick,
-      .tick_units = MINUTE_UNIT
-    }
-  };
-
-  app_event_loop(params, &handlers);
+static void window_unload(Window *window) {
+  tick_timer_service_unsubscribe();
+  for(int cnt=0; cnt<LAYERS; cnt++) {
+      layer_destroy(layers[cnt]->layer);
+  }
 }
 
+static void init(void) {
+  window = window_create();
+  window_set_background_color(window, GColorBlack);
+  window_set_window_handlers(window, (WindowHandlers) {
+    .load = window_load,
+    .unload = window_unload,
+  });
+  window_stack_push(window, true);
+}
+
+static void deinit(void) {
+  window_destroy(window);
+}
+
+int main(void) {
+  init();
+  app_event_loop();
+  deinit();
+  return 0;
+}

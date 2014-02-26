@@ -1,0 +1,27 @@
+{
+  "uuid": "7112d624-6555-4279-89ae-c086e9369427",
+  "shortName": "Hangul Watch",
+  "longName": "Hangul Watch",
+  "companyName": "Drunkhacker.net",
+  "versionCode": 1,
+  "versionLabel": "1.1.0",
+  "watchapp": {
+    "watchface": true
+  },
+  "appKeys": {
+  },
+  "resources": {
+    "media": [
+      {
+        "type": "raw",
+        "name": "FONT_HAN_LIGHT",
+        "file": "fonts/h01.hex"
+      },
+      {
+        "type": "raw",
+        "name": "FONT_HAN_BOLD",
+        "file": "fonts/h02.hex"
+      }
+    ]
+  }
+}
