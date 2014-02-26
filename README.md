@@ -5,9 +5,15 @@ Pebble Hangul Watch
 --
 페블용 한글시계는 [@krazyeom](http://twitter.com/krazyeom)님의 아이디어로 시작되었고, [@drunkhacker](http://twitter.com/drunkhacker)님이 구현하였으며, [@andrwj](http://twitter.com/andrwj)가 SDK2에 맞춰 변환하였고 몇가지 옵션을 제공하도록 수정/추가 하였습니다. 
 
+v1.3.0
+* [내려받기 v1.2.1](https://raw.github.com/andrwj/pebble-hangul-watch/master/pebble-hangul-watch-v1.3.0.pbw) 
+* 버튼만으로 조작이 가능한 버전입니다. (1.2.x 버전은 PebbleKit Javascript API를 사용하고 있기 때문에 페블앱스토어를 통해서만 설치할 수 있습니다)
+* Watchface의 경우에는 위/아래/선택 버튼에 대해 동작을 지정할 수 없으므로 BACK 버튼과 흔들기로 설정을 변경합니다.
+* BACK 버튼 짧게 누르기: 도트 감소 1 ~ 8
+* BACK 버튼 길게 누르기: 배경색 변경
+* 흔들기: 배경색 변경
 
 v1.2.1
-
 * [내려받기 v1.2.1](https://raw2.github.com/andrwj/pebble-hangul-watch/master/pebble-hangul-watch-v1.2.1.pbw) 
 * 배경색 변경을 지원합니다.
 * 도트 생략정도를 선택할 수 있습니다.
